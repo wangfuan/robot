@@ -1,6 +1,8 @@
 package com.example.fuan.ioiotest;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -19,6 +21,13 @@ public class MainActivity extends IOIOActivity{
     private TextView textView_;
     private SeekBar seekBar_;
     private ToggleButton toggleButton_;
+    private Button forwardButton;
+    private Button backwardButton;
+    private Button stopButton;
+    private float pwmChange;
+    private Boolean motorRotate=true;
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -29,10 +38,41 @@ public class MainActivity extends IOIOActivity{
         seekBar_=(SeekBar)findViewById(R.id.seekBar);
         toggleButton_=(ToggleButton)findViewById(R.id.toggleButton);
 
+        forwardButton=(Button)findViewById(R.id.button2);
+        backwardButton=(Button)findViewById(R.id.button);
+        stopButton=(Button)findViewById(R.id.button3);
+
+        forwardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pwmChange=0.5f;
+                motorRotate=true;
+            }
+        });
+        backwardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pwmChange=0.5f;
+                motorRotate=false;
+            }
+        });
+        stopButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(motorRotate){
+                    pwmChange=1.0f;
+                }
+                else{
+                    pwmChange=0.0f;
+                }
+
+            }
+        });
+
         seekBar_.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                textView_.setText(seekBar_.getProgress()+"%");
+                textView_.setText(seekBar_.getProgress() + "%");
             }
 
             @Override
@@ -50,28 +90,38 @@ public class MainActivity extends IOIOActivity{
     }
     class Looper extends BaseIOIOLooper{
         private PwmOutput pwmOutput_;
+        private DigitalOutput motorRefer;
         private DigitalOutput led_;
         private DigitalInput touchSen_;
 
 
         @Override
         public void setup() throws ConnectionLostException{
-            led_=ioio_.openDigitalOutput(IOIO.LED_PIN,true);
+            led_=ioio_.openDigitalOutput(IOIO.LED_PIN, true);
             pwmOutput_=ioio_.openPwmOutput(12, 100);
+            motorRefer=ioio_.openDigitalOutput(11, true);
             touchSen_=ioio_.openDigitalInput(10, DigitalInput.Spec.Mode.PULL_DOWN);
+
             enableUi(true);
+
         }
 
         @Override
         public void loop() throws ConnectionLostException,InterruptedException{
-            pwmOutput_.setDutyCycle(seekBar_.getProgress() / 100.0f);
+
+
+            pwmOutput_.setDutyCycle(pwmChange);
+            motorRefer.write(motorRotate);
+
+            //pwmOutput_.setDutyCycle(seekBar_.getProgress() / 100.0f);
             //pwmOutput_.setDutyCycle(0.5f);
             //textView_.setText(seekBar_.getProgress()+"%");
-           // led_.write(!toggleButton_.isChecked());
-            if(touchSen_.read())
-                led_.write(true);
-            else
-                led_.write(false);
+            // led_.write(!toggleButton_.isChecked());
+            /**if(touchSen_.read())
+             led_.write(true);
+             else
+             led_.write(false);*/
+
         }
 
         @Override
@@ -94,6 +144,8 @@ public class MainActivity extends IOIOActivity{
             }
         });
     }
+
+
 
 }
 

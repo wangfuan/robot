@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:text="New ToggleButton"
         android:id="@+id/toggleButton"
-        android:layout_marginBottom="61dp"
+        android:checked="false"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
@@ -38,5 +38,30 @@
         android:id="@+id/textView2"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Backward"
+        android:id="@+id/button"
+        android:layout_below="@+id/textView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="89dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Forward"
+        android:id="@+id/button2"
+        android:layout_above="@+id/textView2"
+        android:layout_alignStart="@+id/toggleButton" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stop"
+        android:id="@+id/button3"
+        android:layout_above="@+id/toggleButton"
+        android:layout_alignStart="@+id/toggleButton" />
 
 </RelativeLayout>
