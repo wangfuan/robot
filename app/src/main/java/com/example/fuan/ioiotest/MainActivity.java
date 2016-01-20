@@ -67,7 +67,7 @@ public class MainActivity extends IOIOActivity{
         private Boolean motorRotate_1=true;
         private Boolean motorRotate_2=true;
 
-//        private DigitalOutput led_;
+//      private DigitalOutput led_;
 
         private DigitalOutput LedLefteye;
         private DigitalOutput LedRighteye;
@@ -76,13 +76,17 @@ public class MainActivity extends IOIOActivity{
         private Boolean LedRighteyeswitch=true;
         private Boolean LedMouthswitch=true;
 
-        private DigitalInput infrared;//红外引脚变量设置
-        /**
+        private DigitalInput DetectEdge;//边缘检测输入引脚变量设置
+        private Boolean DetectEdgeflag=true;//边缘检测标志位
+
         private DigitalInput TouchHead;
         private DigitalInput TouchShlf;
         private DigitalInput TouchShrg;
-        private DigitalInput TouchBottom;//触摸部位引脚变量设置*/
-
+        private DigitalInput TouchBottom;//触摸部位引脚变量设置
+        private Boolean TouchHeadflag=true;
+        private Boolean TouchShlfflag=true;
+        private Boolean TouchShrgflag=true;
+        private Boolean TouchBottomflag=true;
 
         @Override
         public void setup() throws ConnectionLostException{
@@ -93,19 +97,19 @@ public class MainActivity extends IOIOActivity{
             PwmOutput_2=ioio_.openPwmOutput(13,100);
             MotorRefer_2=ioio_.openDigitalOutput(14,true);//电机引脚设置
 
-            LedLefteye=ioio_.openDigitalOutput(16,true);
+            LedLefteye=ioio_.openDigitalOutput(16, true);
             LedRighteye=ioio_.openDigitalOutput(17,true);
-            LedMouth=ioio_.openDigitalOutput(18,true);//左右眼、嘴巴处Led灯的引脚设置
+            LedMouth=ioio_.openDigitalOutput(18, true);//左右眼、嘴巴处Led灯的引脚设置
 
 
             //touchSen_=ioio_.openDigitalInput(10, DigitalInput.Spec.Mode.PULL_DOWN);
 
-            infrared=ioio_.openDigitalInput(20);//红外输入管脚设置
-            /**
+            DetectEdge=ioio_.openDigitalInput(20);//边缘检测输入管脚设置
+
             TouchHead=ioio_.openDigitalInput(25);
             TouchShlf=ioio_.openDigitalInput(26);
             TouchShrg=ioio_.openDigitalInput(27);
-            TouchBottom=ioio_.openDigitalInput(28);//触摸部位输入管脚设置*/
+            TouchBottom=ioio_.openDigitalInput(28);//触摸部位输入管脚设置
 
             enableUi(true);
 
@@ -169,17 +173,39 @@ public class MainActivity extends IOIOActivity{
             LedMouth.write(LedMouthswitch);
         }//眼睛和嘴巴的Led开关控制函数，顺序为：左眼，右眼，嘴巴
 
+        public void Detect() throws ConnectionLostException,InterruptedException{
+            if (DetectEdge.read())
+                DetectEdgeflag=true;
+            else
+                DetectEdgeflag=false;
+
+        }//检测到边缘的时候（即无障碍物），红外管输出高电平信号
+
+        public void Touch() throws ConnectionLostException,InterruptedException{
+            if (TouchHead.read())
+                TouchHeadflag = true;
+            else
+                TouchHeadflag = false;
+
+            if (TouchShlf.read())
+                TouchShlfflag = true;
+            else
+                TouchShlfflag = false;
+
+            if (TouchShrg.read())
+                TouchShrgflag = true;
+            else
+                TouchShrgflag = false;
+
+            if (TouchBottom.read())
+                TouchBottomflag = true;
+            else
+                TouchBottomflag = false;
+        }//如果头部、左右耳朵及底部触摸检测成功，相应标志位置高
 
         @Override
         public void loop() throws ConnectionLostException,InterruptedException{
 
-
-            if(infrared.read()){
-                DetectEdge.setText("检测到障碍物");
-            }
-            else{
-                DetectEdge.setText("没有障碍物");
-            }
             //pwmOutput_.setDutyCycle(seekBar_.getProgress() / 100.0f);
             //pwmOutput_.setDutyCycle(0.5f);
             //textView_.setText(seekBar_.getProgress()+"%");
