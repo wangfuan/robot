@@ -21,12 +21,9 @@ public class MainActivity extends IOIOActivity{
     private TextView textView_;
     private SeekBar seekBar_;
     private ToggleButton toggleButton_;
-    private Button forwardButton;
-    private Button backwardButton;
-    private Button stopButton;
-    private float pwmChange;
-    private Boolean motorRotate=true;
 
+
+    private TextView DetectEdge;
 
 
     @Override
@@ -38,36 +35,9 @@ public class MainActivity extends IOIOActivity{
         seekBar_=(SeekBar)findViewById(R.id.seekBar);
         toggleButton_=(ToggleButton)findViewById(R.id.toggleButton);
 
-        forwardButton=(Button)findViewById(R.id.button2);
-        backwardButton=(Button)findViewById(R.id.button);
-        stopButton=(Button)findViewById(R.id.button3);
 
-        forwardButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pwmChange=0.5f;
-                motorRotate=true;
-            }
-        });
-        backwardButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                pwmChange=0.5f;
-                motorRotate=false;
-            }
-        });
-        stopButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(motorRotate){
-                    pwmChange=1.0f;
-                }
-                else{
-                    pwmChange=0.0f;
-                }
 
-            }
-        });
+        DetectEdge=(TextView)findViewById(R.id.detectedge);//红外检测变化时文字框发生改变
 
         seekBar_.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -89,30 +59,104 @@ public class MainActivity extends IOIOActivity{
         enableUi(false);
     }
     class Looper extends BaseIOIOLooper{
-        private PwmOutput pwmOutput_;
-        private DigitalOutput motorRefer;
+        private PwmOutput PwmOutput_1;
+        private DigitalOutput MotorRefer_1;//1号电机
+        private PwmOutput PwmOutput_2;
+        private DigitalOutput MotorRefer_2;//2号电机
+        private float pwmChange;
+        private Boolean motorRotate_1=true;
+        private Boolean motorRotate_2=true;
+
         private DigitalOutput led_;
-        private DigitalInput touchSen_;
+
+        private DigitalInput infrared;//红外引脚变量设置
+        /**
+        private DigitalInput TouchHead;
+        private DigitalInput TouchShlf;
+        private DigitalInput TouchShrg;
+        private DigitalInput TouchBottom;//触摸部位引脚变量设置*/
 
 
         @Override
         public void setup() throws ConnectionLostException{
             led_=ioio_.openDigitalOutput(IOIO.LED_PIN, true);
-            pwmOutput_=ioio_.openPwmOutput(12, 100);
-            motorRefer=ioio_.openDigitalOutput(11, true);
-            touchSen_=ioio_.openDigitalInput(10, DigitalInput.Spec.Mode.PULL_DOWN);
+
+            PwmOutput_1=ioio_.openPwmOutput(11, 100);
+            MotorRefer_1=ioio_.openDigitalOutput(12, true);
+            PwmOutput_2=ioio_.openPwmOutput(13,100);
+            MotorRefer_2=ioio_.openDigitalOutput(14,true);//电机引脚设置
+
+            //touchSen_=ioio_.openDigitalInput(10, DigitalInput.Spec.Mode.PULL_DOWN);
+
+            infrared=ioio_.openDigitalInput(20);//红外输入管脚设置
+            /**
+            TouchHead=ioio_.openDigitalInput(25);
+            TouchShlf=ioio_.openDigitalInput(26);
+            TouchShrg=ioio_.openDigitalInput(27);
+            TouchBottom=ioio_.openDigitalInput(28);//触摸部位输入管脚设置*/
 
             enableUi(true);
 
         }
 
+        public void MoveForward(int speed) throws ConnectionLostException,InterruptedException{
+            pwmChange = speed/100.0f;
+            motorRotate_1=true;
+            motorRotate_2=true;
+            PwmOutput_1.setDutyCycle(pwmChange);
+            MotorRefer_1.write(motorRotate_1);
+            PwmOutput_2.setDutyCycle(pwmChange);
+            MotorRefer_2.write(motorRotate_2);
+        }//电机正转
+
+        public void Backward(int speed) throws ConnectionLostException,InterruptedException{
+            pwmChange = speed/100.0f;
+            motorRotate_1=false;
+            motorRotate_2=false;
+            PwmOutput_1.setDutyCycle(pwmChange);
+            MotorRefer_1.write(motorRotate_1);
+            PwmOutput_2.setDutyCycle(pwmChange);
+            MotorRefer_2.write(motorRotate_2);
+        }//电机反转
+
+        public void TurnCircle(int speed,boolean direction) throws ConnectionLostException,InterruptedException{
+            pwmChange = speed/100.0f;
+            motorRotate_1 = direction;
+            motorRotate_2 = !direction;
+            PwmOutput_1.setDutyCycle(pwmChange);
+            MotorRefer_1.write(!motorRotate_1);
+            PwmOutput_2.setDutyCycle(pwmChange);
+            MotorRefer_2.write(motorRotate_2);
+        }//机器人原地旋转，可以控制旋转速度和旋转方向（顺、逆时针），但是不能控制圆周旋转角度
+
+        public void Stop() throws ConnectionLostException,InterruptedException{
+            if (motorRotate_1){
+                pwmChange=1.0f;
+            }
+            else {
+                pwmChange=0.0f;
+            }
+            PwmOutput_1.setDutyCycle(pwmChange);
+            if (motorRotate_2){
+                pwmChange=1.0f;
+            }
+            else {
+                pwmChange=0.0f;
+            }
+            PwmOutput_2.setDutyCycle(pwmChange);
+        }//不管机器人在哪个运动状态，都可以使机器人停止
+
+
         @Override
         public void loop() throws ConnectionLostException,InterruptedException{
 
 
-            pwmOutput_.setDutyCycle(pwmChange);
-            motorRefer.write(motorRotate);
-
+            if(infrared.read()){
+                DetectEdge.setText("检测到障碍物");
+            }
+            else{
+                DetectEdge.setText("没有障碍物");
+            }
             //pwmOutput_.setDutyCycle(seekBar_.getProgress() / 100.0f);
             //pwmOutput_.setDutyCycle(0.5f);
             //textView_.setText(seekBar_.getProgress()+"%");
@@ -128,6 +172,7 @@ public class MainActivity extends IOIOActivity{
         public void disconnected(){
             enableUi(false);
         }
+
     }
 
     @Override
@@ -144,9 +189,6 @@ public class MainActivity extends IOIOActivity{
             }
         });
     }
-
-
-
 }
 
 /*public class MainActivity extends ActionBarActivity {
