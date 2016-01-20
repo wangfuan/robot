@@ -67,7 +67,14 @@ public class MainActivity extends IOIOActivity{
         private Boolean motorRotate_1=true;
         private Boolean motorRotate_2=true;
 
-        private DigitalOutput led_;
+//        private DigitalOutput led_;
+
+        private DigitalOutput LedLefteye;
+        private DigitalOutput LedRighteye;
+        private DigitalOutput LedMouth;//嘴巴、眼睛处的led灯
+        private Boolean LedLefteyeswitch=true;
+        private Boolean LedRighteyeswitch=true;
+        private Boolean LedMouthswitch=true;
 
         private DigitalInput infrared;//红外引脚变量设置
         /**
@@ -79,12 +86,17 @@ public class MainActivity extends IOIOActivity{
 
         @Override
         public void setup() throws ConnectionLostException{
-            led_=ioio_.openDigitalOutput(IOIO.LED_PIN, true);
+            //led_=ioio_.openDigitalOutput(IOIO.LED_PIN, true);
 
             PwmOutput_1=ioio_.openPwmOutput(11, 100);
             MotorRefer_1=ioio_.openDigitalOutput(12, true);
             PwmOutput_2=ioio_.openPwmOutput(13,100);
             MotorRefer_2=ioio_.openDigitalOutput(14,true);//电机引脚设置
+
+            LedLefteye=ioio_.openDigitalOutput(16,true);
+            LedRighteye=ioio_.openDigitalOutput(17,true);
+            LedMouth=ioio_.openDigitalOutput(18,true);//左右眼、嘴巴处Led灯的引脚设置
+
 
             //touchSen_=ioio_.openDigitalInput(10, DigitalInput.Spec.Mode.PULL_DOWN);
 
@@ -145,6 +157,17 @@ public class MainActivity extends IOIOActivity{
             }
             PwmOutput_2.setDutyCycle(pwmChange);
         }//不管机器人在哪个运动状态，都可以使机器人停止
+
+        public void Led(boolean lefteye,boolean righteye,boolean mouth)throws  ConnectionLostException,InterruptedException{
+            LedLefteyeswitch=lefteye;
+            LedLefteye.write(LedLefteyeswitch);
+
+            LedRighteyeswitch=righteye;
+            LedRighteye.write(LedRighteyeswitch);
+
+            LedMouthswitch=mouth;
+            LedMouth.write(LedMouthswitch);
+        }//眼睛和嘴巴的Led开关控制函数，顺序为：左眼，右眼，嘴巴
 
 
         @Override
