@@ -63,11 +63,19 @@
         android:layout_above="@+id/textView2"
         android:layout_alignStart="@+id/toggleButton" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Circle"
+        android:id="@+id/button4"
+        android:layout_above="@+id/seekBar"
+        android:layout_centerHorizontal="true" />
+
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Find obstacle"
+        android:text="没有障碍物"
         android:id="@+id/detectedge"
         android:layout_below="@+id/textView"
         android:layout_alignParentStart="true"
@@ -77,10 +85,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Medium Text"
+        android:text="触摸部位"
         android:id="@+id/textView3"
         android:layout_below="@+id/detectedge"
         android:layout_alignParentStart="true"
         android:layout_marginTop="43dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Led灯的位置"
+        android:id="@+id/textView4"
+        android:layout_alignTop="@+id/textView3"
+        android:layout_alignStart="@+id/textView2" />
 
 </RelativeLayout>
