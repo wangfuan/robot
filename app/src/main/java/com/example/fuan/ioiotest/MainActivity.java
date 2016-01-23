@@ -20,6 +20,7 @@ public class MainActivity extends BaseActivity {
     private Button backwardButton;
     private Button stopButton;
 
+
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -58,6 +59,8 @@ public class MainActivity extends BaseActivity {
         addListenerToggleButtonLeftMotor();
 
         addListenSeekbar();
+
+        //addListenDetectEdge();
     }
 
     public void addListenerToggleButtonCircle(){
@@ -122,14 +125,17 @@ public class MainActivity extends BaseActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 textView_.setText(seekBar_.getProgress() + "%");
             }
+
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
 
             }
+
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
 
             }
         });
     }
+
 }

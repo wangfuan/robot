@@ -13,6 +13,13 @@ import ioio.lib.util.android.IOIOActivity;
 public class BaseActivity extends IOIOActivity{
     private PwmOutput leftMotorPwm1,leftMotorPwm2,rightMotorPwm1,rightMotorPwm2;
     private float leftMoterPwmDuty1,leftMoterPwmDuty2,rightMotorPwmDuty1,rightMotorPwmDuty2;
+    /*
+    detectEdge为边缘检测变量
+    detectEdgeEnable为边缘检测开关，true时为开启量，false时为关闭量
+     */
+    private DigitalInput detectEdge;
+    private Boolean detectEdgeEnable=true;
+
 
     class Looper extends BaseIOIOLooper{
         /*
@@ -25,10 +32,19 @@ public class BaseActivity extends IOIOActivity{
             rightMotorPwm1 = ioio_.openPwmOutput(13, 100);
             rightMotorPwm2 = ioio_.openPwmOutput(14, 100);
         }
+        /*
+        * 函数名称：initDetectEdge()
+        * 函数功能：红外模块引脚GPIO口设置
+        */
+        public void initDetectEdge() throws ConnectionLostException,InterruptedException{
+            detectEdge = ioio_.openDigitalInput(29);
+
+        }
 
         @Override
         public void setup() throws ConnectionLostException,InterruptedException{
             initMotor();
+            initDetectEdge();
         }
         /*
         * 函数名称：setMotorDuty
@@ -44,6 +60,14 @@ public class BaseActivity extends IOIOActivity{
         @Override
         public void loop() throws ConnectionLostException,InterruptedException{
             setMotorDuty();
+            /*
+            设置detectEdgeEnable位可选择是否开启边缘检测功能，
+             */
+            if(detectEdgeEnable){
+                if (detectEdge.read()){
+                    moveStop();
+                }
+            }
         }
 
         @Override
@@ -68,6 +92,7 @@ public class BaseActivity extends IOIOActivity{
             rightMotorPwmDuty1 = 0;
             rightMotorPwmDuty2 = 0;
         }
+
     }
     /*
     * 函数名称：moveBackward
@@ -185,6 +210,7 @@ public class BaseActivity extends IOIOActivity{
             }
         }
     }
+
     protected IOIOLooper createIOIOLooper(){
         return new Looper();
     }
