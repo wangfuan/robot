@@ -35,6 +35,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 moveForward(seekBar_.getProgress());
+
             }
         });
         backwardButton.setOnClickListener(new View.OnClickListener() {
