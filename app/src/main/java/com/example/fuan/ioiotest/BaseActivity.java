@@ -1,9 +1,10 @@
 package com.example.fuan.ioiotest;
 
+
 import ioio.lib.api.DigitalInput;
 import ioio.lib.api.DigitalOutput;
-import ioio.lib.api.IOIO;
 import ioio.lib.api.PwmOutput;
+import ioio.lib.api.DigitalOutput.Spec.Mode;
 import ioio.lib.api.exception.ConnectionLostException;
 import ioio.lib.util.BaseIOIOLooper;
 import ioio.lib.util.IOIOLooper;
@@ -38,6 +39,11 @@ public class BaseActivity extends IOIOActivity{
     private Boolean faceLedLeftEyeFlag;
     private Boolean faceLedRightEyeFlag;
     private Boolean faceLedMouthFlag;
+    /*
+    steeringEginePwm为舵机Pwm波输出变量
+     */
+    private PwmOutput steeringEginePwm1,steeringEginePwm2;
+    private float steeringEginePwmDuty1,steeringEginePwmDuty2;
 
     class Looper extends BaseIOIOLooper{
         /*
@@ -78,22 +84,40 @@ public class BaseActivity extends IOIOActivity{
             faceLedRightEye = ioio_.openDigitalOutput(2, false);
             faceLedMouth = ioio_.openDigitalOutput(3, false);
         }
+        /*
+        * 函数名称：initSteering()
+        * 功能:舵机模块引脚GPIO口设置
+         */
+        public void initSteering() throws ConnectionLostException,InterruptedException{
+            steeringEginePwm1 = ioio_.openPwmOutput(6, 50);
+            steeringEginePwm2 = ioio_.openPwmOutput(10, 50);
+        }
+
         @Override
         public void setup() throws ConnectionLostException,InterruptedException{
             initMotor();
             initDetectEdge();
             initTouchSence();
             initLed();
+            initSteering();
         }
         /*
         * 函数名称：setMotorDuty
-        * 功能：电机pwm波和数字电平参数设置
+        * 功能：电机pwm波参数设置
         */
         public void setMotorDuty()  throws ConnectionLostException,InterruptedException{
             leftMotorPwm1.setDutyCycle(leftMoterPwmDuty1);
             leftMotorPwm2.setDutyCycle(leftMoterPwmDuty2);
             rightMotorPwm1.setDutyCycle(rightMotorPwmDuty1);
             rightMotorPwm2.setDutyCycle(rightMotorPwmDuty2);
+        }
+        /*
+        * 函数名称：setSteeringDuty()
+        * 功能：舵机pwm波参数设置
+        */
+        public void setSteeringDuty() throws ConnectionLostException, InterruptedException {
+            steeringEginePwm1.setDutyCycle(steeringEginePwmDuty1);
+            steeringEginePwm2.setDutyCycle(steeringEginePwmDuty2);
         }
         /*
         * 函数名称：judgeTouchPlace()
@@ -136,6 +160,7 @@ public class BaseActivity extends IOIOActivity{
             setMotorDuty();
             judgeTouchPlace();
             setDetectEdge();
+            setSteeringDuty();
         }
 
         @Override
@@ -331,6 +356,15 @@ public class BaseActivity extends IOIOActivity{
                 }
             }
         }
+    }
+    /*
+    * 函数名称：steeringEngine
+    * 功能：可以实现舵机180°转动调节，speed=0时，电机占空比设为2.5，此时对应的转动角度为0，发生舵机的抖动，
+    * 所以设为2.56，让电机转动角度初值比0大一点
+     */
+    public void steeringEngine(float speed){
+        steeringEginePwmDuty1=(2.56f+speed/10)/100;
+        steeringEginePwmDuty2=(2.56f+speed/10)/100;
     }
     protected IOIOLooper createIOIOLooper(){
         return new Looper();

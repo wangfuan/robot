@@ -1,5 +1,6 @@
 package com.example.fuan.ioiotest;
 
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -20,7 +21,6 @@ public class MainActivity extends BaseActivity {
     private Button backwardButton;
     private Button stopButton;
 
-
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -35,7 +35,6 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 moveForward(seekBar_.getProgress());
-
             }
         });
         backwardButton.setOnClickListener(new View.OnClickListener() {
@@ -125,6 +124,8 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 textView_.setText(seekBar_.getProgress() + "%");
+                steeringEngine(seekBar_.getProgress());
+
             }
 
             @Override
@@ -138,5 +139,8 @@ public class MainActivity extends BaseActivity {
             }
         });
     }
-
 }
+
+
+
+
