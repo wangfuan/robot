@@ -40,10 +40,10 @@ public class BaseActivity extends IOIOActivity{
     private Boolean faceLedRightEyeFlag;
     private Boolean faceLedMouthFlag;
     /*
-    steeringEginePwm为舵机Pwm波输出变量
+    servoPwm为舵机Pwm波输出变量
      */
-    private PwmOutput steeringEginePwm1,steeringEginePwm2;
-    private float steeringEginePwmDuty1,steeringEginePwmDuty2;
+    private PwmOutput servoPwm1,servoPwm2;
+    private float servoPwmDuty1,servoPwmDuty2;
 
     class Looper extends BaseIOIOLooper{
         /*
@@ -85,12 +85,12 @@ public class BaseActivity extends IOIOActivity{
             faceLedMouth = ioio_.openDigitalOutput(3, false);
         }
         /*
-        * 函数名称：initSteering()
+        * 函数名称：initServo()
         * 功能:舵机模块引脚GPIO口设置
          */
-        public void initSteering() throws ConnectionLostException,InterruptedException{
-            steeringEginePwm1 = ioio_.openPwmOutput(6, 50);
-            steeringEginePwm2 = ioio_.openPwmOutput(10, 50);
+        public void initServo() throws ConnectionLostException,InterruptedException{
+            servoPwm1 = ioio_.openPwmOutput(6, 50);
+            servoPwm2 = ioio_.openPwmOutput(10, 50);
         }
 
         @Override
@@ -99,7 +99,7 @@ public class BaseActivity extends IOIOActivity{
             initDetectEdge();
             initTouchSence();
             initLed();
-            initSteering();
+            initServo();
         }
         /*
         * 函数名称：setMotorDuty
@@ -112,12 +112,12 @@ public class BaseActivity extends IOIOActivity{
             rightMotorPwm2.setDutyCycle(rightMotorPwmDuty2);
         }
         /*
-        * 函数名称：setSteeringDuty()
+        * 函数名称：setServoDuty()
         * 功能：舵机pwm波参数设置
         */
-        public void setSteeringDuty() throws ConnectionLostException, InterruptedException {
-            steeringEginePwm1.setDutyCycle(steeringEginePwmDuty1);
-            steeringEginePwm2.setDutyCycle(steeringEginePwmDuty2);
+        public void setServoDuty() throws ConnectionLostException, InterruptedException {
+            servoPwm1.setDutyCycle(servoPwmDuty1);
+            servoPwm2.setDutyCycle(servoPwmDuty2);
         }
         /*
         * 函数名称：judgeTouchPlace()
@@ -160,7 +160,7 @@ public class BaseActivity extends IOIOActivity{
             setMotorDuty();
             judgeTouchPlace();
             setDetectEdge();
-            setSteeringDuty();
+            setServoDuty();
         }
 
         @Override
@@ -362,9 +362,9 @@ public class BaseActivity extends IOIOActivity{
     * 功能：可以实现舵机180°转动调节，speed=0时，电机占空比设为2.5，此时对应的转动角度为0，发生舵机的抖动，
     * 所以设为2.56，让电机转动角度初值比0大一点
      */
-    public void steeringEngine(float speed){
-        steeringEginePwmDuty1=(2.56f+speed/10)/100;
-        steeringEginePwmDuty2=(2.56f+speed/10)/100;
+    public void servoControl(float angle){
+        servoPwmDuty1=(2.56f+angle/10)/100;
+        servoPwmDuty2=(2.56f+angle/10)/100;
     }
     protected IOIOLooper createIOIOLooper(){
         return new Looper();

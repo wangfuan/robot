@@ -124,7 +124,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 textView_.setText(seekBar_.getProgress() + "%");
-                steeringEngine(seekBar_.getProgress());
+                servoControl(seekBar_.getProgress());
 
             }
 
