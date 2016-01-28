@@ -14,12 +14,17 @@ import ioio.lib.util.android.IOIOActivity;
 public class BaseActivity extends IOIOActivity{
     private PwmOutput leftMotorPwm1,leftMotorPwm2,rightMotorPwm1,rightMotorPwm2;
     private float leftMoterPwmDuty1,leftMoterPwmDuty2,rightMotorPwmDuty1,rightMotorPwmDuty2;
+    private final static int PwmPin1=11;
+    private final static int PwmPin2=12;
+    private final static int PwmPin3=13;
+    private final static int PwmPin4=14;
     /*
     detectEdge为红外模块输入变量，用于边缘检测
     detectEdgeEnable为边缘检测开关，true时为开启量，false时为关闭量
      */
     private DigitalInput detectEdge;
     private Boolean detectEdgeEnable=false;
+    private final static int DetectEdgePin=29;
     /*
     touchSence为触摸传感器输入变量
     touchSencePlace全局变量记录发什么触摸的位置
@@ -30,6 +35,11 @@ public class BaseActivity extends IOIOActivity{
     private DigitalInput touchSence4;
     private DigitalInput touchSence5;
     private int touchSencePlace;
+    private final static int TouchSencePin1=22;
+    private final static int TouchSencePin2=23;
+    private final static int TouchSencePin3=24;
+    private final static int TouchSencePin4=25;
+    private final static int TouchSencePin5=26;
     /*
     faceLed为Led输出变量
      */
@@ -39,11 +49,16 @@ public class BaseActivity extends IOIOActivity{
     private Boolean faceLedLeftEyeFlag;
     private Boolean faceLedRightEyeFlag;
     private Boolean faceLedMouthFlag;
+    private final static int FaceLedPin1=1;
+    private final static int FaceLedPin2=2;
+    private final static int FaceLedPin3=3;
     /*
     servoPwm为舵机Pwm波输出变量
      */
     private PwmOutput servoPwm1,servoPwm2;
     private float servoPwmDuty1,servoPwmDuty2;
+    private final static int ServoPin1=6;
+    private final static int ServoPin2=10;
 
     class Looper extends BaseIOIOLooper{
         /*
@@ -51,17 +66,17 @@ public class BaseActivity extends IOIOActivity{
         * 功能：电机引脚GPIO口设置
         */
         public void initMotor() throws ConnectionLostException,InterruptedException{
-            leftMotorPwm1 = ioio_.openPwmOutput(11, 100);
-            leftMotorPwm2 = ioio_.openPwmOutput(12, 100);
-            rightMotorPwm1 = ioio_.openPwmOutput(13, 100);
-            rightMotorPwm2 = ioio_.openPwmOutput(14, 100);
+            leftMotorPwm1 = ioio_.openPwmOutput(PwmPin1, 100);
+            leftMotorPwm2 = ioio_.openPwmOutput(PwmPin2, 100);
+            rightMotorPwm1 = ioio_.openPwmOutput(PwmPin3, 100);
+            rightMotorPwm2 = ioio_.openPwmOutput(PwmPin4, 100);
         }
         /*
         * 函数名称：initDetectEdge()
         * 功能：红外模块引脚GPIO口设置
         */
         public void initDetectEdge() throws ConnectionLostException,InterruptedException{
-            detectEdge = ioio_.openDigitalInput(29);
+            detectEdge = ioio_.openDigitalInput(DetectEdgePin);
 
         }
         /*
@@ -69,28 +84,28 @@ public class BaseActivity extends IOIOActivity{
         * 功能：触摸模块引脚GPIO口设置
         */
         public void initTouchSence() throws ConnectionLostException,InstantiationError{
-            touchSence1 = ioio_.openDigitalInput(22);
-            touchSence2 = ioio_.openDigitalInput(23);
-            touchSence3 = ioio_.openDigitalInput(24);
-            touchSence4 = ioio_.openDigitalInput(25);
-            touchSence5 = ioio_.openDigitalInput(26);
+            touchSence1 = ioio_.openDigitalInput(TouchSencePin1);
+            touchSence2 = ioio_.openDigitalInput(TouchSencePin2);
+            touchSence3 = ioio_.openDigitalInput(TouchSencePin3);
+            touchSence4 = ioio_.openDigitalInput(TouchSencePin4);
+            touchSence5 = ioio_.openDigitalInput(TouchSencePin5);
         }
         /*
         * 函数名称：initLed()
         * 功能：Led模块引脚GPIO口设置
         */
         public void initLed() throws ConnectionLostException,InterruptedException{
-            faceLedLeftEye = ioio_.openDigitalOutput(1, false);
-            faceLedRightEye = ioio_.openDigitalOutput(2, false);
-            faceLedMouth = ioio_.openDigitalOutput(3, false);
+            faceLedLeftEye = ioio_.openDigitalOutput(FaceLedPin1, false);
+            faceLedRightEye = ioio_.openDigitalOutput(FaceLedPin2, false);
+            faceLedMouth = ioio_.openDigitalOutput(FaceLedPin3, false);
         }
         /*
         * 函数名称：initServo()
         * 功能:舵机模块引脚GPIO口设置
          */
         public void initServo() throws ConnectionLostException,InterruptedException{
-            servoPwm1 = ioio_.openPwmOutput(6, 50);
-            servoPwm2 = ioio_.openPwmOutput(10, 50);
+            servoPwm1 = ioio_.openPwmOutput(ServoPin1, 50);
+            servoPwm2 = ioio_.openPwmOutput(ServoPin2, 50);
         }
 
         @Override
