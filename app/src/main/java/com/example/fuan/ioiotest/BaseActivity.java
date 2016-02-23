@@ -11,7 +11,8 @@ import ioio.lib.util.IOIOLooper;
 import ioio.lib.util.android.IOIOActivity;
 
 
-public class BaseActivity extends IOIOActivity{
+public class
+        BaseActivity extends IOIOActivity{
     private PwmOutput leftMotorPwm1,leftMotorPwm2,rightMotorPwm1,rightMotorPwm2;
     private float leftMoterPwmDuty1,leftMoterPwmDuty2,rightMotorPwmDuty1,rightMotorPwmDuty2;
     private final static int PwmPin1=11;
@@ -83,7 +84,7 @@ public class BaseActivity extends IOIOActivity{
         * 函数名称：initTouchSence()
         * 功能：触摸模块引脚GPIO口设置
         */
-        public void initTouchSence() throws ConnectionLostException,InstantiationError{
+        public void initTouchSence() throws ConnectionLostException,InterruptedException{
             touchSence1 = ioio_.openDigitalInput(TouchSencePin1);
             touchSence2 = ioio_.openDigitalInput(TouchSencePin2);
             touchSence3 = ioio_.openDigitalInput(TouchSencePin3);
