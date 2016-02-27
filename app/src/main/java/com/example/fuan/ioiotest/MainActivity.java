@@ -1,15 +1,22 @@
 package com.example.fuan.ioiotest;
 
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import ioio.lib.api.Uart;
+import ioio.lib.util.android.IOIOActivity;
 
-public class MainActivity extends BaseActivity {
+
+public class MainActivity extends Activity {
+    BaseService ba=new BaseService();
     private TextView textView_;
     private SeekBar seekBar_;
 
@@ -22,10 +29,12 @@ public class MainActivity extends BaseActivity {
     private Button stopButton;
 
     @Override
+
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        startService(new Intent(this, BaseService.class));
 
         forwardButton=(Button)findViewById(R.id.button2);
         backwardButton=(Button)findViewById(R.id.button);
@@ -34,25 +43,26 @@ public class MainActivity extends BaseActivity {
         forwardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                moveForward(seekBar_.getProgress());
+                ba.moveForward(seekBar_.getProgress());
             }
         });
         backwardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                moveBackward(seekBar_.getProgress());
+                ba.moveBackward(seekBar_.getProgress());
             }
         });
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                moveStop();
+                ba.moveStop();
                 circle.setText("Circle");
                 leftMotor.setText("LeftMotor");
                 rightMotor.setText("RightMotor");
             }
         });
 
+       //turn();
 
         addListenerToggleButtonCircle();
         addListenerToggleButtonRightMotor();
@@ -61,6 +71,25 @@ public class MainActivity extends BaseActivity {
         addListenSeekbar();
 
         //addListenDetectEdge();
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+//        startService(new Intent(this, BaseService.class));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+//        startService(new Intent(this, BaseService.class));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+//      startService(new Intent(this, BaseService.class));
+        stopService(new Intent(this, BaseService.class));
+        finish();
     }
 
     public void addListenerToggleButtonCircle(){
@@ -72,10 +101,10 @@ public class MainActivity extends BaseActivity {
 
                 if (circle.isChecked()) {
                     circle.setText("左转圈");
-                    turnCircle(seekBar_.getProgress(), true);
+                    ba.turnCircle(seekBar_.getProgress(), true);
                 } else {
                     circle.setText("右转圈");
-                    turnCircle(seekBar_.getProgress(), false);
+                    ba.turnCircle(seekBar_.getProgress(), false);
                 }
             }
         });
@@ -89,11 +118,11 @@ public class MainActivity extends BaseActivity {
 
                 if (leftMotor.isChecked()){
                     leftMotor.setText("LeftMotor前转");
-                    motorLeft(seekBar_.getProgress(), false);
+                    ba.motorLeft(seekBar_.getProgress(), false);
                 }
                 else {
                     leftMotor.setText("LeftMotor后转");
-                    motorLeft(seekBar_.getProgress(), true);
+                    ba.motorLeft(seekBar_.getProgress(), true);
                 }
             }
         });
@@ -107,12 +136,12 @@ public class MainActivity extends BaseActivity {
 
                 if (rightMotor.isChecked()){
                     rightMotor.setText("RightMotor前转");
-                    motorRight(seekBar_.getProgress(), false);
+                    ba.motorRight(seekBar_.getProgress(), false);
 
                 }
                 else {
                     rightMotor.setText("RightMotor后转");
-                    motorRight(seekBar_.getProgress(), true);
+                    ba.motorRight(seekBar_.getProgress(), true);
                 }
             }
         });
@@ -124,7 +153,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 textView_.setText(seekBar_.getProgress() + "%");
-                servoControl(seekBar_.getProgress());
+                ba.servoControl(seekBar_.getProgress());
 
             }
 
