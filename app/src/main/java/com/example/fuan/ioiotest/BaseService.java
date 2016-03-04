@@ -2,6 +2,7 @@ package com.example.fuan.ioiotest;
 import ioio.lib.api.DigitalInput;
 import ioio.lib.api.DigitalOutput;
 import ioio.lib.api.IOIO;
+import ioio.lib.api.PulseInput;
 import ioio.lib.api.PwmOutput;
 import ioio.lib.api.exception.ConnectionLostException;
 import ioio.lib.util.BaseIOIOLooper;
@@ -63,8 +64,21 @@ public class BaseService extends IOIOService {
      */
     private PwmOutput servoPwm1,servoPwm2;
     private static float servoPwmDuty1,servoPwmDuty2;
-    private final static int ServoPin1=6;
+    private final static int ServoPin1=5;
     private final static int ServoPin2=10;
+
+    /**
+     * ultrasonicSensorTrigger为超生波探测器触发数字输出信号变量
+     * ultrasonicSensorEcho为超声波探测器回声检测持续时间输出口
+     * ultrasonicSensor_Pin设置超声波探测器的连接引脚
+     */
+    public   static  DigitalOutput ultrasonicSensorTrigger;
+    public static PulseInput ultrasonicSensorEcho;
+    private final static int ultrasonicSensorTrigger_Pin=7;
+    private final static int ultrasonicSensorEcho_Pin=6;
+    public   static  IOIO ioio_;
+    public static int echoSeconds;
+    public static int echoDistanceCm;
 
     @Override
     protected IOIOLooper createIOIOLooper() {
@@ -115,7 +129,18 @@ public class BaseService extends IOIOService {
                 servoPwm1 = ioio_.openPwmOutput(ServoPin1, 50);
                 servoPwm2 = ioio_.openPwmOutput(ServoPin2, 50);
             }
-
+            /**
+             * 方法名称：initUltrasonicSensor()
+             * 功能：超声波传感器引脚的GPIO口设置
+             */
+            public void initUltrasonicSensor() throws ConnectionLostException{
+                try{
+                    ultrasonicSensorEcho=ioio_.openPulseInput(ultrasonicSensorEcho_Pin, PulseInput.PulseMode.POSITIVE);
+                    ultrasonicSensorTrigger=ioio_.openDigitalOutput(ultrasonicSensorTrigger_Pin);
+                }catch (ConnectionLostException e){
+                    throw e;
+                }
+            }
 
             @Override
             protected void setup() throws ConnectionLostException,
@@ -130,6 +155,10 @@ public class BaseService extends IOIOService {
                 initTouchSence();
                 initLed();
                 initServo();
+                initUltrasonicSensor();
+                UltrasonicsSensorOutput us =new UltrasonicsSensorOutput();
+               // new Thread(us).start(); //超声波测距传感器的线程实例化后放在这里启动
+                us.start();
                 Log.v("ServiceDemo", "已经初始化");
             }
             /*
@@ -277,6 +306,7 @@ public class BaseService extends IOIOService {
 
             }
         }
+
         /*
         *函数名称：moveStop
         *功能：电机停止转动
@@ -437,3 +467,30 @@ public class BaseService extends IOIOService {
 
 }
 
+/**
+ * 此方法创建了超声波测距模块单独运行的线程
+ *
+ * run()内部为线程运行时的执行体
+ */
+class UltrasonicsSensorOutput extends Thread{
+    @Override
+    public void run() {
+        while(true)
+        {
+            try {
+                BaseService.ultrasonicSensorTrigger.write(false);
+                Thread.sleep(5);
+                BaseService.ultrasonicSensorTrigger.write(true);
+                Thread.sleep(1);
+                BaseService.ultrasonicSensorTrigger.write(false);
+                BaseService.echoSeconds=(int)(BaseService.ultrasonicSensorEcho.getDuration()*1000*1000);
+                BaseService.echoDistanceCm=BaseService.echoSeconds/29/2;
+                Thread.sleep(20);
+           //   Log.d("Thread", "get the data");//超生波测距线程循环执行的时候可以打印此日志
+            }catch (InterruptedException e){
+                BaseService.ioio_.disconnect();
+            }catch (ConnectionLostException e){
+            }
+        }
+    }
+}
