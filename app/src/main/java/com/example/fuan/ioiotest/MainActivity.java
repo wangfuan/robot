@@ -1,5 +1,8 @@
 package com.example.fuan.ioiotest;
 
+
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -9,7 +12,12 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-public class MainActivity extends BaseActivity {
+import ioio.lib.api.Uart;
+import ioio.lib.util.android.IOIOActivity;
+
+
+public class MainActivity extends Activity {
+    BaseService ba=new BaseService();
     private TextView textView_;
     private SeekBar seekBar_;
 
@@ -25,34 +33,34 @@ public class MainActivity extends BaseActivity {
     private ProgressBar ultrasonicsSensorPrograss;
     private ToggleButton ultrasonicsSensorButton;
 
-    private volatile Boolean flag = true;
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+
+    public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        startService(new Intent(this, BaseService.class));
 
-        forwardButton = (Button) findViewById(R.id.button2);
-        backwardButton = (Button) findViewById(R.id.button);
-        stopButton = (Button) findViewById(R.id.button3);
-
+        forwardButton=(Button)findViewById(R.id.button2);
+        backwardButton=(Button)findViewById(R.id.button);
+        stopButton=(Button)findViewById(R.id.button3);
 
         forwardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                moveForward(seekBar_.getProgress());
+                ba.moveForward(seekBar_.getProgress());
             }
         });
         backwardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                moveBackward(seekBar_.getProgress());
+                ba.moveBackward(seekBar_.getProgress());
             }
         });
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                moveStop();
+                ba.moveStop();
                 circle.setText("Circle");
                 leftMotor.setText("LeftMotor");
                 rightMotor.setText("RightMotor");
@@ -60,27 +68,41 @@ public class MainActivity extends BaseActivity {
         });
 
 
+
         addListenerToggleButtonCircle();
         addListenerToggleButtonRightMotor();
         addListenerToggleButtonLeftMotor();
 
         addListenSeekbar();
-
         ultrasonicsSensorButton = (ToggleButton) findViewById(R.id.button6);
         ultrasonicsSensorPrograss = (ProgressBar) findViewById(R.id.progressBar);
         ultrasonicsSensorText = (TextView) findViewById(R.id.textSet8);
         addListenerUltrasonicsSensor();
 
-        Log.d("Ultrasonic", "the final output");
 
-        //addListenDetectEdge();
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+//        startService(new Intent(this, BaseService.class));
     }
 
-    /**
-     * 电机转圈控制按钮
-     */
-    public void addListenerToggleButtonCircle() {
-        circle = (ToggleButton) findViewById(R.id.toggleButton);
+    @Override
+    protected void onStop() {
+        super.onStop();
+//        startService(new Intent(this, BaseService.class));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+//      startService(new Intent(this, BaseService.class));
+        stopService(new Intent(this, BaseService.class));
+        finish();
+    }
+
+    public void addListenerToggleButtonCircle(){
+        circle=(ToggleButton)findViewById(R.id.toggleButton);
         circle.setText("Circle");
         circle.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,20 +110,16 @@ public class MainActivity extends BaseActivity {
 
                 if (circle.isChecked()) {
                     circle.setText("左转圈");
-                    turnCircle(seekBar_.getProgress(), true);
+                    ba.turnCircle(seekBar_.getProgress(), true);
                 } else {
                     circle.setText("右转圈");
-                    turnCircle(seekBar_.getProgress(), false);
+                    ba.turnCircle(seekBar_.getProgress(), false);
                 }
             }
         });
     }
-
-    /**
-     * 左电机控制按钮
-     */
-    public void addListenerToggleButtonLeftMotor() {
-        leftMotor = (ToggleButton) findViewById(R.id.toggleButton2);
+    public void addListenerToggleButtonLeftMotor(){
+        leftMotor=(ToggleButton)findViewById(R.id.toggleButton2);
         leftMotor.setText("LeftMotor");
         leftMotor.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,48 +127,41 @@ public class MainActivity extends BaseActivity {
 
                 if (leftMotor.isChecked()) {
                     leftMotor.setText("LeftMotor前转");
-                    motorLeft(seekBar_.getProgress(), false);
+                    ba.motorLeft(seekBar_.getProgress(), false);
                 } else {
                     leftMotor.setText("LeftMotor后转");
-                    motorLeft(seekBar_.getProgress(), true);
+                    ba.motorLeft(seekBar_.getProgress(), true);
                 }
             }
         });
     }
-
-    /**
-     * 右电机控制按钮
-     */
-    public void addListenerToggleButtonRightMotor() {
-        rightMotor = (ToggleButton) findViewById(R.id.toggleButton3);
+    public void addListenerToggleButtonRightMotor(){
+        rightMotor=(ToggleButton)findViewById(R.id.toggleButton3);
         rightMotor.setText("RightMotor");
         rightMotor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if (rightMotor.isChecked()) {
+                if (rightMotor.isChecked()){
                     rightMotor.setText("RightMotor前转");
-                    motorRight(seekBar_.getProgress(), false);
+                    ba.motorRight(seekBar_.getProgress(), false);
 
-                } else {
+                }
+                else {
                     rightMotor.setText("RightMotor后转");
-                    motorRight(seekBar_.getProgress(), true);
+                    ba.motorRight(seekBar_.getProgress(), true);
                 }
             }
         });
     }
-
-    /**
-     * 电机速度和舵机角度设置进度条
-     */
-    public void addListenSeekbar() {
-        textView_ = (TextView) findViewById(R.id.textView2);
-        seekBar_ = (SeekBar) findViewById(R.id.seekBar);
+    public void addListenSeekbar(){
+        textView_=(TextView)findViewById(R.id.textView2);
+        seekBar_=(SeekBar)findViewById(R.id.seekBar);
         seekBar_.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 textView_.setText(seekBar_.getProgress() + "%");
-                servoControl(seekBar_.getProgress());
+                ba.servoControl(seekBar_.getProgress());
 
             }
 
@@ -164,7 +175,7 @@ public class MainActivity extends BaseActivity {
 
             }
         });
-    };
+    }
 
     /**
      * 超声波测距监听按钮
@@ -190,15 +201,13 @@ public class MainActivity extends BaseActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                ultrasonicsSensorText.setText(String.valueOf(echoDistanceCm));
-                ultrasonicsSensorPrograss.setProgress(echoSeconds);
-                Log.d("UI","receive the data");
+                ultrasonicsSensorText.setText(String.valueOf(BaseService.echoDistanceCm));
+                ultrasonicsSensorPrograss.setProgress(BaseService.echoSeconds);
+                Log.d("UI", "receive the data");
             }
         });
     }
-
 }
-
 
 
 
