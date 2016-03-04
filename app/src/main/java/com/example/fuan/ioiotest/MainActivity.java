@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -27,6 +28,10 @@ public class MainActivity extends Activity {
     private Button forwardButton;
     private Button backwardButton;
     private Button stopButton;
+
+    private TextView ultrasonicsSensorText;
+    private ProgressBar ultrasonicsSensorPrograss;
+    private ToggleButton ultrasonicsSensorButton;
 
     @Override
 
@@ -62,15 +67,19 @@ public class MainActivity extends Activity {
             }
         });
 
-       //turn();
+
 
         addListenerToggleButtonCircle();
         addListenerToggleButtonRightMotor();
         addListenerToggleButtonLeftMotor();
 
         addListenSeekbar();
+        ultrasonicsSensorButton = (ToggleButton) findViewById(R.id.button6);
+        ultrasonicsSensorPrograss = (ProgressBar) findViewById(R.id.progressBar);
+        ultrasonicsSensorText = (TextView) findViewById(R.id.textSet8);
+        addListenerUltrasonicsSensor();
 
-        //addListenDetectEdge();
+
     }
     @Override
     protected void onPause() {
@@ -116,11 +125,10 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
 
-                if (leftMotor.isChecked()){
+                if (leftMotor.isChecked()) {
                     leftMotor.setText("LeftMotor前转");
                     ba.motorLeft(seekBar_.getProgress(), false);
-                }
-                else {
+                } else {
                     leftMotor.setText("LeftMotor后转");
                     ba.motorLeft(seekBar_.getProgress(), true);
                 }
@@ -165,6 +173,37 @@ public class MainActivity extends Activity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
 
+            }
+        });
+    }
+
+    /**
+     * 超声波测距监听按钮
+     */
+    public void addListenerUltrasonicsSensor(){
+        ultrasonicsSensorButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ultrasonicsSensorButton.isChecked()) {
+                    updateUI();
+                }
+                else{
+                    updateUI();
+                }
+            }
+        });
+    }
+
+    /**
+     * 用于接收超声波测距的数据并更新UI界面
+     */
+    public void updateUI(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ultrasonicsSensorText.setText(String.valueOf(BaseService.echoDistanceCm));
+                ultrasonicsSensorPrograss.setProgress(BaseService.echoSeconds);
+                Log.d("UI", "receive the data");
             }
         });
     }

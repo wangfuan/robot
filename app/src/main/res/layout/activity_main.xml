@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
@@ -9,92 +10,140 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.fuan.ioiotest.MainActivity">
 
-    <SeekBar
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/seekBar"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="89dp" />
 
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="1,2">
+        <TableRow>
+            <Button android:id="@+id/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Backward"
+                android:layout_alignParentTop="true"
+                android:layout_alignEnd="@+id/seekBar" />
+
+            <Button android:id="@+id/button2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Forward"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true" />
+
+            <Button android:id="@+id/button3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stop"
+                android:layout_below="@+id/button2"
+                android:layout_centerHorizontal="true" />
+        </TableRow>
+        <TableRow>
+            <TextView android:id="@+id/textSet1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="向后移动"/>
+            <TextView android:id="@+id/textSet2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="向前移动"/>
+            <TextView android:id="@+id/textSet3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="停止移动"/>
+        </TableRow>
+        <TableRow>
+            <ToggleButton android:id="@+id/toggleButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignStart="@+id/button3"
+                android:checked="true"
+                android:text="Circle"/>
+
+            <ToggleButton android:id="@+id/toggleButton2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:layout_alignTop="@+id/button3"
+                android:layout_alignParentStart="true"
+                android:text="LeftMotor"/>
+
+            <ToggleButton android:id="@+id/toggleButton3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RightMotor"
+                android:checked="false"
+                android:layout_alignTop="@+id/button3"
+                android:layout_alignParentEnd="true" />
+        </TableRow>
+        <TableRow>
+            <TextView android:id="@+id/textSet4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="转圈移动"/>
+            <TextView android:id="@+id/textSet5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="左电机转动"/>
+            <TextView android:id="@+id/textSet6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="右电机转动"/>
+        </TableRow>
+    </TableLayout>
+    <SeekBar android:id="@+id/seekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="10%"
         android:id="@+id/textView2"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentStart="false" />
-
-    <Button
+        android:layout_gravity="center_horizontal" />
+    <TextView android:id="@+id/textSet7"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Backward"
-        android:id="@+id/button"
-        android:layout_alignParentTop="true"
-        android:layout_alignEnd="@+id/seekBar" />
+        android:text="电机速度调节"
+        android:layout_gravity="center_horizontal">
+    </TextView>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Forward"
-        android:id="@+id/button2"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Stop"
-        android:id="@+id/button3"
-        android:layout_below="@+id/button2"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="62dp" />
-
-    <ToggleButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Circle"
-        android:id="@+id/toggleButton"
-        android:layout_alignParentTop="true"
-        android:layout_alignStart="@+id/button3"
-        android:checked="true" />
-
-    <ToggleButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="LeftMotor"
-        android:id="@+id/toggleButton2"
-        android:layout_above="@+id/textView2"
-        android:layout_alignParentStart="true"
-        android:checked="false"
-        android:layout_toStartOf="@+id/button3" />
-
-    <ToggleButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="RightMotor"
-        android:id="@+id/toggleButton3"
-        android:layout_above="@+id/textView2"
-        android:layout_alignParentEnd="true"
-        android:checked="false"
-        android:layout_toEndOf="@+id/button3" />
-
-    <ToggleButton
+    <ToggleButton android:id="@+id/toggleButton4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Steering"
-        android:id="@+id/toggleButton4"
+
         android:layout_toEndOf="@+id/toggleButton2"
         android:checked="false"
         android:layout_alignParentBottom="true" />
 
-    <Button
+    <Button android:id="@+id/button4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="New Button"
-        android:id="@+id/button4"
-        android:layout_alignParentBottom="true"
-        android:layout_alignStart="@+id/button" />
 
-</RelativeLayout>
+        android:layout_alignParentBottom="true"
+        android:layout_x="90dp"
+        android:layout_y="135dp"/>
+
+
+    <ProgressBar android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@android:style/Widget.ProgressBar.Horizontal"/>
+    <TextView android:id="@+id/textSet8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        android:layout_gravity="center_horizontal">
+    </TextView>
+    <ToggleButton android:id="@+id/button6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="超声波测距的开关"
+        android:layout_gravity="center_horizontal"
+        android:checked="false">
+    </ToggleButton>
+
+</LinearLayout>
