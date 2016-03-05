@@ -12,9 +12,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import ioio.lib.api.Uart;
-import ioio.lib.util.android.IOIOActivity;
-
 
 public class MainActivity extends Activity {
     BaseService ba=new BaseService();
@@ -29,9 +26,15 @@ public class MainActivity extends Activity {
     private Button backwardButton;
     private Button stopButton;
 
+    private SeekBar seekBarServo;
+    private TextView textViewServo;
+
+
     private TextView ultrasonicsSensorText;
     private ProgressBar ultrasonicsSensorPrograss;
     private ToggleButton ultrasonicsSensorButton;
+
+    private ToggleButton detectEdgeButton;
 
     @Override
 
@@ -44,6 +47,8 @@ public class MainActivity extends Activity {
         forwardButton=(Button)findViewById(R.id.button2);
         backwardButton=(Button)findViewById(R.id.button);
         stopButton=(Button)findViewById(R.id.button3);
+
+        seekBar_=(SeekBar)findViewById(R.id.seekBar);//电机速度调节模块
 
         forwardButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,12 +79,13 @@ public class MainActivity extends Activity {
         addListenerToggleButtonLeftMotor();
 
         addListenSeekbar();
+
         ultrasonicsSensorButton = (ToggleButton) findViewById(R.id.button6);
         ultrasonicsSensorPrograss = (ProgressBar) findViewById(R.id.progressBar);
         ultrasonicsSensorText = (TextView) findViewById(R.id.textSet8);
         addListenerUltrasonicsSensor();
 
-
+        addListenerDetectEdge();
     }
     @Override
     protected void onPause() {
@@ -155,13 +161,14 @@ public class MainActivity extends Activity {
         });
     }
     public void addListenSeekbar(){
-        textView_=(TextView)findViewById(R.id.textView2);
-        seekBar_=(SeekBar)findViewById(R.id.seekBar);
-        seekBar_.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        ba.servoControl(90);
+        textViewServo=(TextView)findViewById(R.id.textSet9);
+        seekBarServo=(SeekBar)findViewById(R.id.seekBar2);
+        seekBarServo.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                textView_.setText(seekBar_.getProgress() + "%");
-                ba.servoControl(seekBar_.getProgress());
+                textViewServo.setText(seekBarServo.getProgress() + "度");
+                ba.servoControl(seekBarServo.getProgress());
 
             }
 
@@ -186,8 +193,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 if (ultrasonicsSensorButton.isChecked()) {
                     updateUI();
-                }
-                else{
+                } else {
                     updateUI();
                 }
             }
@@ -204,6 +210,23 @@ public class MainActivity extends Activity {
                 ultrasonicsSensorText.setText(String.valueOf(BaseService.echoDistanceCm));
                 ultrasonicsSensorPrograss.setProgress(BaseService.echoSeconds);
                 Log.d("UI", "receive the data");
+            }
+        });
+    }
+
+    public void addListenerDetectEdge(){
+        detectEdgeButton=(ToggleButton)findViewById(R.id.button7);
+        detectEdgeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (detectEdgeButton.isChecked()){
+                    ba.detectEdgeEnable=true;
+                    detectEdgeButton.setText("边缘检测开");
+                }
+                else {
+                    ba.detectEdgeEnable=false;
+                    detectEdgeButton.setText("边缘检测关");
+                }
             }
         });
     }

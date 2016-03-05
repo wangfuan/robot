@@ -1,4 +1,5 @@
 package com.example.fuan.ioiotest;
+
 import ioio.lib.api.DigitalInput;
 import ioio.lib.api.DigitalOutput;
 import ioio.lib.api.IOIO;
@@ -15,26 +16,31 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
-/**
- * Created by jiangly on 2016/2/26.
- */
 public class BaseService extends IOIOService {
+    /**
+     * 左右电机的Pwm波和占空比变量设置
+     * Pwm_Pin设置Pwm波输出引脚
+     */
     private PwmOutput leftMotorPwm1,leftMotorPwm2,rightMotorPwm1,rightMotorPwm2;
     private static float leftMoterPwmDuty1,leftMoterPwmDuty2,rightMotorPwmDuty1,rightMotorPwmDuty2;
     private final static int PwmPin1=11;
     private final static int PwmPin2=12;
     private final static int PwmPin3=13;
     private final static int PwmPin4=14;
-    /*
-    detectEdge为红外模块输入变量，用于边缘检测
-    detectEdgeEnable为边缘检测开关，true时为开启量，false时为关闭量
+
+    /**
+     * detectEdge为边缘检测模块输入变量
+     * detectEdgeEnable为边缘检测开关，true时为开启量，false时为关闭量
+     * DetectEdge_Pin设置边缘检测模块的引脚
      */
     private static DigitalInput detectEdge;
-    private static Boolean detectEdgeEnable=false;
+    public static Boolean detectEdgeEnable=false;
     private final static int DetectEdgePin=29;
-    /*
-    touchSence为触摸传感器输入变量
-    touchSencePlace全局变量记录发什么触摸的位置
+
+    /**
+     * touchSence为触摸传感器输入变量
+     * touchSencePlace全局变量记录发什么触摸的位置
+     * TouchSence_Pin设置触摸检测模块的引脚
      */
     private DigitalInput touchSence1;
     private DigitalInput touchSence2;
@@ -47,8 +53,11 @@ public class BaseService extends IOIOService {
     private final static int TouchSencePin3=24;
     private final static int TouchSencePin4=25;
     private final static int TouchSencePin5=26;
-    /*
-    faceLed为Led输出变量
+
+    /**
+     * faceLed为头部Led输出变量
+     * faceLedFlag为Led使能标志
+     * FaceLed_Pin设置头部Led输出引脚
      */
     private DigitalOutput faceLedLeftEye;
     private DigitalOutput faceLedRightEye;
@@ -59,12 +68,15 @@ public class BaseService extends IOIOService {
     private final static int FaceLedPin1=1;
     private final static int FaceLedPin2=2;
     private final static int FaceLedPin3=3;
-    /*
-    servoPwm为舵机Pwm波输出变量
+
+    /**
+     * servoPwm为舵机Pwm波输出变量
+     * servoPwmDuty为舵机Pwm波占空比变量
+     * Servo_Pin设置舵机Pwm波输出引脚
      */
     private PwmOutput servoPwm1,servoPwm2;
     private static float servoPwmDuty1,servoPwmDuty2;
-    private final static int ServoPin1=5;
+    private final static int ServoPin1=35;
     private final static int ServoPin2=10;
 
     /**
@@ -83,28 +95,30 @@ public class BaseService extends IOIOService {
     @Override
     protected IOIOLooper createIOIOLooper() {
         return new BaseIOIOLooper() {
-            /*
-     * 函数名称：initMotor
-     * 功能：电机引脚GPIO口设置
-     */
+            /**
+             * 方法名称：initMotor（）
+             * 功能：电机引脚GPIO口设置
+             */
             public void initMotor() throws ConnectionLostException,InterruptedException{
                 leftMotorPwm1 = ioio_.openPwmOutput(PwmPin1, 100);
                 leftMotorPwm2 = ioio_.openPwmOutput(PwmPin2, 100);
                 rightMotorPwm1 = ioio_.openPwmOutput(PwmPin3, 100);
                 rightMotorPwm2 = ioio_.openPwmOutput(PwmPin4, 100);
             }
-            /*
-            * 函数名称：initDetectEdge()
-            * 功能：红外模块引脚GPIO口设置
-            */
+
+            /**
+             * 方法名称：initDetectEdge()
+             * 功能：红外模块引脚GPIO口设置
+             */
             public void initDetectEdge() throws ConnectionLostException,InterruptedException{
                 detectEdge = ioio_.openDigitalInput(DetectEdgePin);
 
             }
-            /*
-            * 函数名称：initTouchSence()
-            * 功能：触摸模块引脚GPIO口设置
-            */
+
+            /**
+             * 方法名称：initTouchSence()
+             * 功能：触摸模块引脚GPIO口设置
+             */
             public void initTouchSence() throws ConnectionLostException,InterruptedException{
                 touchSence1 = ioio_.openDigitalInput(TouchSencePin1);
                 touchSence2 = ioio_.openDigitalInput(TouchSencePin2);
@@ -112,23 +126,26 @@ public class BaseService extends IOIOService {
                 touchSence4 = ioio_.openDigitalInput(TouchSencePin4);
                 touchSence5 = ioio_.openDigitalInput(TouchSencePin5);
             }
-            /*
-            * 函数名称：initLed()
-            * 功能：Led模块引脚GPIO口设置
-            */
+
+            /**
+             * 方法名称：initLed()
+             * 功能：Led模块引脚GPIO口设置
+             */
             public void initLed() throws ConnectionLostException,InterruptedException{
                 faceLedLeftEye = ioio_.openDigitalOutput(FaceLedPin1, false);
                 faceLedRightEye = ioio_.openDigitalOutput(FaceLedPin2, false);
                 faceLedMouth = ioio_.openDigitalOutput(FaceLedPin3, false);
             }
-            /*
-            * 函数名称：initServo()
-            * 功能:舵机模块引脚GPIO口设置
+
+            /**
+             * 方法名称：initServo()
+             * 功能:舵机模块引脚GPIO口设置
              */
             public void initServo() throws ConnectionLostException,InterruptedException{
                 servoPwm1 = ioio_.openPwmOutput(ServoPin1, 50);
                 servoPwm2 = ioio_.openPwmOutput(ServoPin2, 50);
             }
+
             /**
              * 方法名称：initUltrasonicSensor()
              * 功能：超声波传感器引脚的GPIO口设置
@@ -142,14 +159,12 @@ public class BaseService extends IOIOService {
                 }
             }
 
+            /**
+             * 方法名称：setup()
+             * 功能：在当前线程中对各个模块进行初始化
+             */
             @Override
-            protected void setup() throws ConnectionLostException,
-                    InterruptedException {
-//                leftMotorPwm1 = ioio_.openPwmOutput(11, 100);
-//                leftMotorPwm2 = ioio_.openPwmOutput(12, 100);
-//                rightMotorPwm1 = ioio_.openPwmOutput(13, 100);
-//                rightMotorPwm2 = ioio_.openPwmOutput(14, 100);
-
+            protected void setup() throws ConnectionLostException,InterruptedException {
                 initMotor();
                 initDetectEdge();
                 initTouchSence();
@@ -161,28 +176,31 @@ public class BaseService extends IOIOService {
                 us.start();
                 Log.v("ServiceDemo", "已经初始化");
             }
-            /*
-                   * 函数名称：setMotorDuty
-                   * 功能：电机pwm波参数设置
-                   */
+
+            /**
+             * 方法名称：setMotorDuty
+             * 功能：电机pwm波参数设置
+             */
             public  void setMotorDuty()  throws ConnectionLostException,InterruptedException{
                 leftMotorPwm1.setDutyCycle(leftMoterPwmDuty1);
                 leftMotorPwm2.setDutyCycle(leftMoterPwmDuty2);
                 rightMotorPwm1.setDutyCycle(rightMotorPwmDuty1);
                 rightMotorPwm2.setDutyCycle(rightMotorPwmDuty2);
             }
-            /*
-            * 函数名称：setServoDuty()
-            * 功能：舵机pwm波参数设置
-            */
+
+            /**
+             * 方法名称：setServoDuty()
+             * 功能：舵机pwm波参数设置
+             */
             public void setServoDuty() throws ConnectionLostException, InterruptedException {
                 servoPwm1.setDutyCycle(servoPwmDuty1);
                 servoPwm2.setDutyCycle(servoPwmDuty2);
             }
-            /*
-            * 函数名称：judgeTouchPlace()
-            * 功能：依次读取触摸传感器的各GPIO口电平，然后在触摸事件发生时判断发生触摸的位置，用touchSencePlace来记录
-            */
+
+            /**
+             * 方法名称：judgeTouchPlace()
+             * 功能：依次读取触摸传感器的各GPIO口电平，然后在触摸事件发生时判断发生触摸的位置，用touchSencePlace来记录
+             */
             public void judgeTouchPlace() throws ConnectionLostException,InterruptedException{
                 if (touchSence1.read())
                     touchSencePlace=1;
@@ -195,9 +213,10 @@ public class BaseService extends IOIOService {
                 if (touchSence5.read())
                     touchSencePlace=5;
             }
-            /*
-            函数名称：setDetectEdge()
-            功能：判断机器人的运动方向上是否存在跌落的危险
+
+            /**
+             * 方法名称：setDetectEdge()
+             * 功能：判断机器人的运动方向上是否存在跌落的危险
              */
             public void setDetectEdge() throws ConnectionLostException,InterruptedException{
                 if(detectEdgeEnable){
@@ -206,38 +225,42 @@ public class BaseService extends IOIOService {
                     }
                 }
             }
-            /*
-            * 函数名称：setFaceLedPlace(boolean lefteye,boolean rigtheye,boolean mouth)
-            * 功能：设置Led灯的位置并且控制灯的亮灭
-            */
+
+            /**
+             * 方法名称：setFaceLedPlace()
+             * 功能：设置Led灯的位置并且控制灯的亮灭
+             */
             public void setFaceLedPlace() throws ConnectionLostException,InterruptedException{
                 faceLedLeftEye.write(faceLedLeftEyeFlag);
                 faceLedRightEye.write(faceLedRightEyeFlag);
                 faceLedMouth.write(faceLedMouthFlag);
             }
+
+
+            /**
+             * 当IOIO连接建立的时候反复调用loop（）方法
+             *
+             * @throws ConnectionLostException
+             *         当IOIO连接丢失的时候
+             * @throws InterruptedException
+             *         当IOIO线程中断的时候
+             */
             @Override
-            public void loop() throws ConnectionLostException,
-                    InterruptedException {
-//                leftMotorPwm1.setDutyCycle( 20/100.0f);
-//                leftMotorPwm2.setDutyCycle(0);
-//                rightMotorPwm1.setDutyCycle(0);
-//                rightMotorPwm2.setDutyCycle( 20/100.0f);
+            public void loop() throws ConnectionLostException,InterruptedException {
                 setMotorDuty();
                 judgeTouchPlace();
                 setDetectEdge();
                 setServoDuty();
-                Log.v("ServiceDemo", "正在循坏");
-                Log.v("ServiceDemo","leftMoterPwmDuty1    "+ leftMoterPwmDuty1);
-                Log.v("ServiceDemo","leftMoterPwmDuty2    "+ leftMoterPwmDuty2);
-                Log.v("ServiceDemo","rightMotorPwmDuty1   "+ rightMotorPwmDuty1);
-                Log.v("ServiceDemo","rightMotorPwmDuty2   "+ rightMotorPwmDuty2);
             }
         };
     }
-        /*
-        * 函数名称：moveForward
-        * 功能：电机正转，可以调节速度，但是超过提前标定的速度阈值则不能转动
-        */
+
+        /**
+         * 方法名称：moveForward(int speed)
+         * 功能：电机正转
+         *
+         * @param speed 调节速度
+         */
         public static void moveForward(int speed){
             if( (speed >=0) && (speed <= 100)){
                 leftMoterPwmDuty1 = speed/100.0f;
@@ -253,10 +276,13 @@ public class BaseService extends IOIOService {
             }
 
         }
-        /*
-        * 函数名称：moveBackward
-        * 功能    ：电机反转，可以调节速度，但是超过提前标定的速度阈值则不能转动
-        */
+
+        /**
+         * 方法名称：moveBackward（int speed）
+         * 功能：电机反转
+         *
+         * @param speed 调节速度
+         */
         public static void moveBackward(int speed){
             if( (speed >=0) && (speed <= 100)){
                 leftMoterPwmDuty1 = 0;
@@ -271,10 +297,14 @@ public class BaseService extends IOIOService {
                 rightMotorPwmDuty2 = 0;
             }
         }
-        /*
-        *函数名称：turnCircle
-        *功能：原地转圈,可以实现正反转及转动速度的调节,但是速度超过提前设置的速度阈值则不能移动
-        */
+
+        /**
+         * 方法名称：turnCircle(int speed,boolean direction)
+         * 功能：原地转圈
+         *
+         * @param speed 调节速度
+         * @param direction 调节转动方向
+         */
         public static void turnCircle(int speed,boolean direction) {
             if (direction){
                 if( (speed >= 0) && (speed <= 100)){
@@ -307,10 +337,10 @@ public class BaseService extends IOIOService {
             }
         }
 
-        /*
-        *函数名称：moveStop
-        *功能：电机停止转动
-        */
+        /**
+         * 方法名称：moveStop（）
+         * 功能：电机停止转动
+         */
         public static void moveStop(){
             leftMoterPwmDuty1 = 0;
             leftMoterPwmDuty2 = 0;
@@ -318,9 +348,11 @@ public class BaseService extends IOIOService {
             rightMotorPwmDuty2 = 0;
         }
 
-        /*
-        * 函数名称：motorLeft
-        * 功能：左电机控制，可实现速度和旋转方向的调节，但是速度超过提前设置的速度阈值则不能移动
+        /**
+         * 方法名称：motorLeft(int speed,boolean direction)
+         * 功能：左电机控制
+         * @param speed 调节速度
+         * @param direction 调节转动方向
          */
         public static void motorLeft(int speed,boolean direction){
             if(direction){
@@ -344,9 +376,13 @@ public class BaseService extends IOIOService {
                 }
             }
         }
-        /*
-        * 函数名称：motorRight
-        * 功能：右电机控制，可实现速度和旋转方向的调节，但是速度超过提前设置的速度阈值则不能移动
+
+        /**
+         * 方法名称：motorRight(int speed,boolean direction)
+         * 功能：右电机控制
+         *
+         * @param speed 调节速度
+         * @param direction 调节转动方向
          */
         public static void motorRight(int speed,boolean direction){
             if(direction){
@@ -370,6 +406,12 @@ public class BaseService extends IOIOService {
                 }
             }
         }
+
+        /**
+         * 方法名称：openLed(int ledPlace)
+         * 功能：开启头部Led
+         * @param ledPlace Led点亮的位置
+         */
         public static void openLed(int ledPlace) {
             if ((ledPlace >= 0 )&&(ledPlace < 8)){
                 switch (ledPlace){
@@ -424,18 +466,19 @@ public class BaseService extends IOIOService {
                 }
             }
         }
-        /*
-        * 函数名称：steeringEngine
-        * 功能：可以实现舵机180°转动调节，speed=0时，电机占空比设为2.5，此时对应的转动角度为0，发生舵机的抖动，
-        * 所以设为2.56，让电机转动角度初值比0大一点
+
+        /**
+         * 方法名称：servoControl(float angle)
+         * 功能：可以实现舵机180°转动调节，speed=0时，电机占空比设为2.5，此时对应的转动角度为0，发生舵机的抖动，
+         * 所以设为2.56，让电机转动角度初值比0大一点
+         *
+         * @param angle 调整舵机转动到达的角度
          */
         public static void servoControl(float angle){
-            servoPwmDuty1=(2.56f+angle/10)/100;
-            servoPwmDuty2=(2.56f+angle/10)/100;
+            servoPwmDuty1=(0.0256f+0.0005f*angle);
+            servoPwmDuty2=(0.0256f+0.0005f*angle);
         }
-//        protected IOIOLooper createIOIOLooper(){
-//            return new Looper();
-//        }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         int result = super.onStartCommand(intent, flags, startId);
@@ -486,7 +529,6 @@ class UltrasonicsSensorOutput extends Thread{
                 BaseService.echoSeconds=(int)(BaseService.ultrasonicSensorEcho.getDuration()*1000*1000);
                 BaseService.echoDistanceCm=BaseService.echoSeconds/29/2;
                 Thread.sleep(20);
-           //   Log.d("Thread", "get the data");//超生波测距线程循环执行的时候可以打印此日志
             }catch (InterruptedException e){
                 BaseService.ioio_.disconnect();
             }catch (ConnectionLostException e){
